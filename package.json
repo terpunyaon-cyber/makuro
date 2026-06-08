@@ -1,12 +1,11 @@
 {
   "name": "makuro-service",
   "version": "1.0.0",
-  "main": "makuro-server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node makuro-server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.2"
   }
 }
-
