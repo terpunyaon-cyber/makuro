@@ -244,7 +244,8 @@ app.get("/raw/:id", (req, res) => {
         if (ua.toLowerCase().includes(b)) return res.status(403).send("Forbidden");
     }
 
-    const isBrowser = ua.includes("Mozilla");
+    const isRoblox = ua.toLowerCase().includes("roblox");
+    const isBrowser = !isRoblox && ua.includes("Mozilla");
     if (isBrowser) {
         return res.send(`<!DOCTYPE html>
 <html>
