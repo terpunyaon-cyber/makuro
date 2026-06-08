@@ -10,7 +10,6 @@ const API_SECRET = process.env.API_SECRET || "makuro-secret-123";
 
 const store = new Map();
 
-// ====== HELPERS ======
 function generateId() {
     return crypto.randomBytes(12).toString("hex");
 }
@@ -21,7 +20,7 @@ app.get("/", (req, res) => {
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Makuro Service</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -35,19 +34,8 @@ app.get("/", (req, res) => {
     align-items: center;
     padding: 40px 20px;
   }
-  .logo {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #00ff88;
-    margin-bottom: 8px;
-    letter-spacing: 3px;
-  }
-  .sub {
-    color: #555;
-    font-size: 0.8rem;
-    margin-bottom: 32px;
-    letter-spacing: 2px;
-  }
+  .logo { font-size: 1.8rem; font-weight: bold; color: #00ff88; margin-bottom: 8px; letter-spacing: 3px; }
+  .sub { color: #555; font-size: 0.8rem; margin-bottom: 32px; letter-spacing: 2px; }
   .box {
     background: #1a1a1a;
     border: 1px solid #2a2a2a;
@@ -55,14 +43,9 @@ app.get("/", (req, res) => {
     padding: 24px;
     width: 100%;
     max-width: 700px;
+    margin-bottom: 20px;
   }
-  label {
-    display: block;
-    color: #888;
-    font-size: 0.8rem;
-    margin-bottom: 8px;
-    letter-spacing: 1px;
-  }
+  label { display: block; color: #888; font-size: 0.8rem; margin-bottom: 8px; letter-spacing: 1px; }
   textarea {
     width: 100%;
     height: 280px;
@@ -75,26 +58,12 @@ app.get("/", (req, res) => {
     padding: 12px;
     resize: vertical;
     outline: none;
+    -webkit-user-select: text;
+    user-select: text;
+    touch-action: manipulation;
   }
   textarea:focus { border-color: #00ff88; }
-  .row {
-    display: flex;
-    gap: 12px;
-    margin-top: 16px;
-    align-items: center;
-  }
-  input[type=text] {
-    flex: 1;
-    background: #111;
-    border: 1px solid #333;
-    border-radius: 6px;
-    color: #e0e0e0;
-    font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
-    padding: 10px 12px;
-    outline: none;
-  }
-  input[type=text]:focus { border-color: #00ff88; }
+  .row { display: flex; gap: 12px; margin-top: 16px; align-items: center; flex-wrap: wrap; }
   button {
     background: #00ff88;
     color: #000;
@@ -105,6 +74,7 @@ app.get("/", (req, res) => {
     font-family: 'Courier New', monospace;
     cursor: pointer;
     letter-spacing: 1px;
+    touch-action: manipulation;
   }
   button:hover { background: #00cc6a; }
   .result {
@@ -116,74 +86,123 @@ app.get("/", (req, res) => {
     display: none;
   }
   .result-label { color: #555; font-size: 0.75rem; margin-bottom: 6px; }
-  .result-url {
-    color: #00ff88;
-    font-size: 0.9rem;
-    word-break: break-all;
-    cursor: pointer;
-  }
+  .result-url { color: #00ff88; font-size: 0.85rem; word-break: break-all; }
   .copy-btn {
     background: #222;
     color: #888;
     border: 1px solid #333;
     border-radius: 4px;
-    padding: 4px 12px;
+    padding: 6px 14px;
     font-size: 0.75rem;
     cursor: pointer;
     margin-top: 8px;
+    touch-action: manipulation;
   }
   .copy-btn:hover { color: #00ff88; border-color: #00ff88; }
-  .footer {
-    margin-top: 40px;
-    color: #333;
-    font-size: 0.75rem;
-    letter-spacing: 2px;
+  .api-box {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%;
+    max-width: 700px;
+    margin-bottom: 20px;
   }
+  .api-title { color: #00ff88; font-size: 0.85rem; margin-bottom: 12px; letter-spacing: 1px; }
+  .api-item { margin-bottom: 12px; }
+  .api-label { color: #555; font-size: 0.75rem; margin-bottom: 4px; }
+  .api-code {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 8px 12px;
+    color: #e0e0e0;
+    font-size: 0.8rem;
+    word-break: break-all;
+  }
+  .footer { margin-top: 20px; color: #333; font-size: 0.75rem; letter-spacing: 2px; }
 </style>
 </head>
 <body>
 <div class="logo">MAKURO</div>
 <div class="sub">CYBER SECURITY SERVICE</div>
+
 <div class="box">
   <label>// PASTE YOUR CODE</label>
-  <textarea id="code" placeholder="-- วางโค้ดของคุณที่นี่..."></textarea>
+  <textarea id="code" placeholder="-- วางโค้ดของคุณที่นี่..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
   <div class="row">
-    <input type="text" id="apikey" placeholder="API Key (ถ้ามี)" />
-    <button onclick="submit()">UPLOAD</button>
+    <button onclick="submitCode()" style="width:100%">UPLOAD</button>
   </div>
   <div class="result" id="result">
     <div class="result-label">// RAW URL</div>
     <div class="result-url" id="result-url"></div>
-    <button class="copy-btn" onclick="copyUrl()">COPY URL</button>
+    <button class="copy-btn" onclick="copyUrl()">📋 COPY URL</button>
   </div>
 </div>
+
+<div class="api-box">
+  <div class="api-title">// API REFERENCE</div>
+  <div class="api-item">
+    <div class="api-label">CREATE (POST)</div>
+    <div class="api-code">POST /api/create<br>Header: x-api-secret: ${API_SECRET}<br>Body: { "content": "โค้ด" }</div>
+  </div>
+  <div class="api-item">
+    <div class="api-label">DELETE (DELETE)</div>
+    <div class="api-code">DELETE /api/delete/:id<br>Header: x-api-secret: ${API_SECRET}</div>
+  </div>
+  <div class="api-item">
+    <div class="api-label">YOUR API KEY</div>
+    <div class="api-code" id="apikey-display">${API_SECRET}</div>
+    <button class="copy-btn" onclick="copyKey()">📋 COPY KEY</button>
+  </div>
+</div>
+
 <div class="footer">CYBER SECURITY BY MAKURO SERVICE POWER</div>
 
 <script>
-async function submit() {
+async function submitCode() {
   const code = document.getElementById('code').value.trim();
-  const key = document.getElementById('apikey').value.trim();
-  if (!code) return alert('กรุณาใส่โค้ด');
-  const res = await fetch('/api/create', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-secret': key || '${API_SECRET}'
-    },
-    body: JSON.stringify({ content: code })
-  });
-  const data = await res.json();
-  if (data.ok) {
-    document.getElementById('result').style.display = 'block';
-    document.getElementById('result-url').innerText = data.url;
-  } else {
-    alert('Error: ' + (data.error || 'unknown'));
+  if (!code) { alert('กรุณาใส่โค้ด'); return; }
+  try {
+    const res = await fetch('/api/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-secret': '${API_SECRET}' },
+      body: JSON.stringify({ content: code })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('result-url').innerText = data.url;
+    } else {
+      alert('Error: ' + (data.error || 'unknown'));
+    }
+  } catch(e) {
+    alert('Error: ' + e.message);
   }
 }
 function copyUrl() {
   const url = document.getElementById('result-url').innerText;
-  navigator.clipboard.writeText(url);
-  alert('Copied!');
+  navigator.clipboard.writeText(url).then(() => alert('Copied!')).catch(() => {
+    const el = document.createElement('textarea');
+    el.value = url;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    alert('Copied!');
+  });
+}
+function copyKey() {
+  const key = document.getElementById('apikey-display').innerText;
+  navigator.clipboard.writeText(key).then(() => alert('Copied!')).catch(() => {
+    const el = document.createElement('textarea');
+    el.value = key;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    alert('Copied!');
+  });
 }
 </script>
 </body>
@@ -194,17 +213,13 @@ function copyUrl() {
 app.post("/api/create", (req, res) => {
     if (req.headers["x-api-secret"] !== API_SECRET)
         return res.status(403).json({ ok: false, error: "forbidden" });
-
     const { content } = req.body;
     if (!content) return res.status(400).json({ ok: false, error: "no content" });
-
     const id = generateId();
     store.set(id, { content, createdAt: Date.now() });
-
     const host = req.headers["host"];
     const protocol = req.headers["x-forwarded-proto"] || "https";
     const url = `${protocol}://${host}/raw/${id}`;
-
     res.json({ ok: true, url, id });
 });
 
@@ -224,16 +239,11 @@ app.get("/raw/:id", (req, res) => {
     if (!entry) return res.status(404).send("Not found");
 
     const ua = req.headers["user-agent"] || "";
-
-    // block curl, wget, python, postman
     const blockedUA = ["curl", "wget", "python", "postman", "insomnia", "httpie"];
     for (const b of blockedUA) {
-        if (ua.toLowerCase().includes(b)) {
-            return res.status(403).send("Forbidden");
-        }
+        if (ua.toLowerCase().includes(b)) return res.status(403).send("Forbidden");
     }
 
-    // browser → หน้า fake
     const isBrowser = ua.includes("Mozilla");
     if (isBrowser) {
         return res.send(`<!DOCTYPE html>
@@ -242,34 +252,20 @@ app.get("/raw/:id", (req, res) => {
 <meta charset="UTF-8">
 <title>Makuro Service</title>
 <style>
-  body {
-    background: #0d0d0d;
-    color: #00ff88;
-    font-family: 'Courier New', monospace;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
-    flex-direction: column;
-    gap: 12px;
-    text-align: center;
-    padding: 20px;
-  }
-  h1 { font-size: 1.3rem; letter-spacing: 2px; }
-  p { color: #444; font-size: 0.8rem; letter-spacing: 1px; }
+  body { background:#0d0d0d; color:#00ff88; font-family:'Courier New',monospace; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; flex-direction:column; gap:12px; text-align:center; padding:20px; }
+  h1 { font-size:1.3rem; letter-spacing:2px; }
+  p { color:#444; font-size:0.8rem; letter-spacing:1px; }
 </style>
 </head>
 <body>
 <h1>🔒 CYBER SECURITY</h1>
-<h1>BY MAKURO SERVICE</h1>
+<h1>BY MAKURO SERVICE POWER</h1>
 <p>THIS RESOURCE IS PROTECTED AND ENCRYPTED</p>
 <p>UNAUTHORIZED ACCESS IS PROHIBITED</p>
 </body>
 </html>`);
     }
 
-    // HttpGet/request → ส่งโค้ดจริง
     res.setHeader("Content-Type", "text/plain");
     res.send(entry.content);
 });
