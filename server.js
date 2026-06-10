@@ -3,8 +3,8 @@ const crypto = require("crypto");
 const multer = require("multer");
 
 const app = express();
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 const PORT = process.env.PORT || 3000;
 const API_SECRET = process.env.API_SECRET || "makuro-secret-123";
